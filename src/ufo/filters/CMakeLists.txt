@@ -315,6 +315,8 @@ set ( filters_files
       obsfunctions/ObsFunctionSelectStatistic.h
       obsfunctions/ObsFunctionStringManipulation.cc
       obsfunctions/ObsFunctionStringManipulation.h
+      obsfunctions/ObsStringFormatter.cc
+      obsfunctions/ObsStringFormatter.h
       obsfunctions/ObsFunctionVelocity.cc
       obsfunctions/ObsFunctionVelocity.h
       obsfunctions/ObsFunctionVisibilityDiagnostic.cc
