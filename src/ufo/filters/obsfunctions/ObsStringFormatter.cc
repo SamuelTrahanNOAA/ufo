@@ -35,7 +35,7 @@ namespace ufo {
   struct ObsTypedef {
     using Float = float;
     using Integer = int;
-    using Integer_64 = int; // ObsSpace get() routines don't have a special type for this.
+    using Integer_64 = int;  // ObsSpace get() routines don't have a special type for this.
     using String = std::string;
     using DateTime = util::DateTime;
     using Bool = ufo::DiagnosticFlag;
@@ -44,45 +44,46 @@ namespace ufo {
   // -----------------------------------------------------------------------------
 
   template<class ToType>
-  static void format_var_type(std::vector<boost::format> &fmt, const ObsFilterData &obs, const Variable &var) {
+  static void format_var_type(std::vector<boost::format> &fmt, const ObsFilterData &obs,
+                              const Variable &var) {
     std::vector<ToType> data;
     obs.get(var, data);
 
     const size_t nlocs = obs.nlocs();
-    for(size_t i = 0; i < nlocs; i++)
+    for (size_t i = 0; i < nlocs; i++)
       fmt[i] % data[i];
   }
 
   // -----------------------------------------------------------------------------
 
-  static void format_one_var(std::vector<boost::format> &fmt, const ObsFilterData &obs, const Variable &var,
+  static void format_one_var(std::vector<boost::format> &fmt, const ObsFilterData &obs,
+                             const Variable &var,
                              boost::optional<std::string> optionalDateFormat) {
     const ioda::ObsDtype targetType = obs.dtype(var);
 
     // Handle the special case of DateTime.formatString()
-    if(targetType == ioda::ObsDtype::DateTime && optionalDateFormat) {
+    if (targetType == ioda::ObsDtype::DateTime && optionalDateFormat) {
       const std::string dateFormat = *optionalDateFormat;
 
       std::vector<ObsTypedef::DateTime> data;
       obs.get(var, data);
 
       const size_t nlocs = obs.nlocs();
-      for(size_t i = 0; i < nlocs; i++)
+      for (size_t i = 0; i < nlocs; i++)
         fmt[i] % data[i].formatString(dateFormat);
-    }
 
     // Remaining cases use the original obs type.
-    else if(targetType == ioda::ObsDtype::Integer)
+    } else if (targetType == ioda::ObsDtype::Integer)
       format_var_type<ObsTypedef::Integer>(fmt, obs, var);
-    else if(targetType == ioda::ObsDtype::Integer_64)
+    else if (targetType == ioda::ObsDtype::Integer_64)
       format_var_type<ObsTypedef::Integer_64>(fmt, obs, var);
-    else if(targetType == ioda::ObsDtype::Float)
+    else if (targetType == ioda::ObsDtype::Float)
       format_var_type<ObsTypedef::Float>(fmt, obs, var);
-    else if(targetType == ioda::ObsDtype::String)
+    else if (targetType == ioda::ObsDtype::String)
       format_var_type<ObsTypedef::String>(fmt, obs, var);
-    else if(targetType == ioda::ObsDtype::Bool)
+    else if (targetType == ioda::ObsDtype::Bool)
       format_var_type<ObsTypedef::Bool>(fmt, obs, var);
-    else if(targetType == ioda::ObsDtype::DateTime)
+    else if (targetType == ioda::ObsDtype::DateTime)
       format_var_type<ObsTypedef::DateTime>(fmt, obs, var);
     else
       throw eckit::BadCast("ObsStringFormatter encountered an unknown type. It can only handle: "
@@ -96,7 +97,7 @@ namespace ufo {
     options_.validateAndDeserialize(conf);
 
     const auto &params = options_.variables.value();
-    for(const auto &param : params)
+    for (const auto &param : params)
       requiredVariables_ += param.variable.value();
   }
 
@@ -120,7 +121,7 @@ namespace ufo {
     const boost::format format(formatString);
 
     // Abort if the user provides the wrong number of variables.
-    if(format.size() != variables.size()) {
+    if (format.size() != variables.size()) {
       std::ostringstream err;
       err << "ObsStringFormatter format length mismatch."
           << " Format wants " << format.size()
@@ -132,11 +133,11 @@ namespace ufo {
     std::vector<boost::format> fmt(nlocs, format);
 
     // For each variable, loop over all observation, and give them to the format object.
-    for(const auto &param : variables)
+    for (const auto &param : variables)
       format_one_var(fmt, in, param.variable.value(), param.dateFormat.value());
 
     // Output each format object as a string to ``out[0]`` via and ostringstream.
-    for(size_t i = 0; i < nlocs; i++)
+    for (size_t i = 0; i < nlocs; i++)
       out[0][i] = (std::ostringstream() << fmt[i]).str();
 
     oops::Log::trace() << "ObsStringFormatter formatting complete" << std::endl;
@@ -147,4 +148,4 @@ namespace ufo {
   const ufo::Variables & ObsStringFormatter::requiredVariables() const {
     return requiredVariables_;
   }
-}
+} // namespace ufo
